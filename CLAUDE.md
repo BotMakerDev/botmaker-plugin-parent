@@ -18,8 +18,8 @@ flatten 1.4.1 `oss` keeping `repositories` and `properties`.
 - **flatten is in `<plugins>`, not only `<pluginManagement>`**, so every child runs it; this pom is not
   replaced by its flattened copy (`updatePomFile` is false for packaging `pom`).
 - **Pins move only by the release library** (`botmaker.studioapi.version`, `botmaker.plugintoolkit.version`),
-  like every module's. A child pins this module by its `<parent><version>`, which the release library moves with
-  `versions:update-parent`.
+  like every module's. A child pins this module by its `<parent><version>`, which the release library moves as a
+  literal (`PomVersions.parentVersion`): any Maven mojo would first resolve the `-SNAPSHOT` parent it replaces.
 - Every pin is held to JitPack's Maven 3.9.9 ceiling (umbrella § JitPack).
 
 ## Building
