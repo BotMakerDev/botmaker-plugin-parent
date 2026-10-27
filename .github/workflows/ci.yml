@@ -1,0 +1,106 @@
+name: CI
+
+# Three jobs, the same shape as the other BotMaker library repos: `build` on every push and PR, `release` and
+# `jitpack` only on a version tag.
+#
+# `build` installs this pom and checks that its pins resolve: the contract and the toolkit are built from
+# source, because on main the pom pins each at its main -SNAPSHOT, which nothing publishes.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check out botmaker-studio-api
+        uses: actions/checkout@v7
+        with:
+          repository: BotMakerDev/botmaker-studio-api
+          path: .deps/botmaker-studio-api
+
+      - name: Check out botmaker-plugin-toolkit
+        uses: actions/checkout@v7
+        with:
+          repository: BotMakerDev/botmaker-plugin-toolkit
+          path: .deps/botmaker-plugin-toolkit
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # RETRIED — Maven Central answers 429 to GitHub-hosted runners; see .github/mvn-retry.sh.
+      - name: Install the two upstreams (their main -SNAPSHOT)
+        run: |
+          source .github/mvn-retry.sh
+          mvn_retry mvn -B -f .deps/botmaker-studio-api/pom.xml install -DskipTests
+          mvn_retry mvn -B -f .deps/botmaker-plugin-toolkit/pom.xml install -DskipTests
+
+      - name: Install, and resolve what a plugin inherits
+        run: |
+          mvn -B install
+          version=$(mvn -B -q help:evaluate -Dexpression=project.version -DforceStdout)
+          mkdir -p target/probe
+          cat > target/probe/pom.xml <<EOF
+          <project xmlns="http://maven.apache.org/POM/4.0.0">
+            <modelVersion>4.0.0</modelVersion>
+            <parent>
+              <groupId>com.github.BotMakerDev</groupId>
+              <artifactId>botmaker-plugin-parent</artifactId>
+              <version>$version</version>
+              <relativePath/>
+            </parent>
+            <artifactId>probe</artifactId>
+            <dependencies>
+              <dependency><groupId>com.github.BotMakerDev</groupId><artifactId>botmaker-studio-api</artifactId></dependency>
+              <dependency><groupId>com.github.BotMakerDev</groupId><artifactId>botmaker-plugin-toolkit</artifactId></dependency>
+              <dependency><groupId>org.openjfx</groupId><artifactId>javafx-controls</artifactId></dependency>
+            </dependencies>
+          </project>
+          EOF
+          mvn -B -f target/probe/pom.xml dependency:resolve
+
+  # The GitHub Release, published by JReleaser from the tag the umbrella's release pushed. It runs HERE and not
+  # from the umbrella working copy: JReleaser's JGit cannot open a submodule, whose `.git` is a file.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The SAME script the release calls to gate this release: one extractor, two readers.
+      - name: Extract the changelog section
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p target
+          tools/changelog-section.sh "$version" > target/jreleaser-changelog.md
+          echo "JRELEASER_PROJECT_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Publish the release
+        uses: jreleaser/release-action@v2
+        with:
+          version: 1.25.0
+          arguments: full-release
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # JitPack builds the artifact itself from the pushed tag; this asks it to start eagerly. No secrets.
+  jitpack:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger JitPack build for ${{ github.ref_name }}
+        run: |
+          curl -sf "https://jitpack.io/api/builds/com.github.${{ github.repository_owner }}/${{ github.event.repository.name }}/${{ github.ref_name }}" || true

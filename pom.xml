@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      The parent a BotMaker plugin's pom names. groupId is com.github.BotMakerDev for the same reason as every
+      other published module: JitPack serves this repo as com.github.BotMakerDev:botmaker-plugin-parent:<tag>.
+      It is its own repository, not a module of another: JitPack serves a multi-module repository's modules
+      as com.github.BotMakerDev.<repo>:<module>, which would be a second groupId. The version is real:
+      -SNAPSHOT on main, the release version on a tag; only the release moves it (umbrella
+      docs/refactor/43-real-versions.md).
+    -->
+    <groupId>com.github.BotMakerDev</groupId>
+    <artifactId>botmaker-plugin-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>BotMaker Plugin Parent</name>
+    <description>
+        The parent pom a BotMaker plugin inherits: the contract, the widget toolkit and JavaFX pinned together,
+        Java 25, and the build every plugin needs (compiler, surefire, flatten keeping the pom's properties).
+    </description>
+
+    <!--
+      WHAT A PLUGIN INHERITS, AND WHY EACH IS HERE.
+
+      One version to move. A plugin pinned the contract and the toolkit as two properties, and nothing kept
+      them a pair that was released together; it pins this parent now, and `botmaker plugin upgrade` moves one
+      number. A plugin may still set botmaker.studioapi.version or botmaker.plugintoolkit.version in its own
+      <properties>: a child's property wins over the parent's in the dependencyManagement below.
+
+      The build a plugin cannot do without: the compiler pinned for JitPack, -parameters, and flatten keeping
+      <properties> — the published pom must still say <botmaker.plugin>, which is what makes the jar a plugin
+      (umbrella docs/refactor/24-plugin-platform.md §10).
+
+      NOT the JitPack repository: a child resolves this parent from its own <repositories>, so it declares
+      jitpack.io itself, and a repository declared here would be one the child could never reach in time.
+
+      NOT `botmaker.plugin`, a <name> or anything that identifies one plugin: <properties> are inherited, and
+      a plugin's identity is its own pom's.
+    -->
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>27</javafx.version>
+        <!-- Each upstream's main version; a release commit sets the released one (doc 43). -->
+        <botmaker.studioapi.version>0.12.1-SNAPSHOT</botmaker.studioapi.version>
+        <botmaker.plugintoolkit.version>0.11.1-SNAPSHOT</botmaker.plugintoolkit.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+              The contract. No scope here: a plugin that marks a bot's code needs it at `compile` (the bot
+              carries its annotations), one that does not may say `provided`. Studio loads it parent-first
+              either way.
+            -->
+            <dependency>
+                <groupId>com.github.BotMakerDev</groupId>
+                <artifactId>botmaker-studio-api</artifactId>
+                <version>${botmaker.studioapi.version}</version>
+            </dependency>
+            <!-- The widgets: `compile`, resolved onto the plugin's own classloader. Never `provided`. -->
+            <dependency>
+                <groupId>com.github.BotMakerDev</groupId>
+                <artifactId>botmaker-plugin-toolkit</artifactId>
+                <version>${botmaker.plugintoolkit.version}</version>
+            </dependency>
+            <!-- `provided`: the host's scene graph is the one a slot editor draws into. -->
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- 3.11.0, not newer: 3.12.0 raised its Maven prerequisite past what JitPack's builder ran
+                     (umbrella CLAUDE.md § JitPack). -parameters keeps a factory's parameter names, which
+                     Studio shows. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!--
+              In <plugins>, so every child runs it. Bakes the inherited pins into the pom a plugin installs
+              and publishes and drops the <parent>, so a bot resolving the plugin needs neither this pom nor a
+              ${…}. oss strips <repositories> and <properties> otherwise: the first a consumer needs to reach
+              com.github.BotMakerDev, the second holds <botmaker.plugin>. 1.4.1 for JitPack's Maven (umbrella
+              CLAUDE.md § JitPack). This pom itself is packaging `pom`, which flatten writes beside it and never
+              installs in its place (updatePomFile defaults to false for `pom`): what a child inherits is this
+              file as written.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.4.1</version>
+                <configuration>
+                    <flattenMode>oss</flattenMode>
+                    <pomElements>
+                        <repositories>keep</repositories>
+                        <properties>keep</properties>
+                    </pomElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten-clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

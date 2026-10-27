@@ -1,0 +1,39 @@
+# JReleaser — what ONE release of this repository looks like: the GitHub Release and its notes. The tag, its
+# order among the modules and the pins are the umbrella release library's. Runs in this repository's CI on a
+# version tag (.github/workflows/ci.yml, `release`); botmaker-plugin-toolkit's jreleaser.yml has the reasons.
+#
+# THE VERSION ARRIVES AS JRELEASER_PROJECT_VERSION, set by the workflow from the tag that triggered it.
+
+project:
+  name: botmaker-plugin-parent
+  description: The parent pom a BotMaker Studio plugin inherits.
+  longDescription: |
+    The contract, the widget toolkit and JavaFX pinned together, Java 25, and the build every plugin needs:
+    the compiler with -parameters, surefire, and flatten keeping the pom's properties, so a plugin's
+    published pom still says which class is the plugin.
+  authors:
+    - LiQiyeDev
+  license: CC0-1.0
+  copyright: LiQiyeDev
+  inceptionYear: '2026'
+  links:
+    homepage: https://github.com/BotMakerDev/botmaker-plugin-parent
+  languages:
+    java:
+      groupId: com.github.BotMakerDev
+      artifactId: botmaker-plugin-parent
+      version: '25'
+
+release:
+  github:
+    owner: BotMakerDev
+    name: botmaker-plugin-parent
+    tagName: 'v{{projectVersion}}'
+    releaseName: 'v{{projectVersion}}'
+    # The release library pushed the tag; that push started this workflow.
+    skipTag: true
+    overwrite: false
+    update:
+      enabled: false
+    changelog:
+      external: target/jreleaser-changelog.md
