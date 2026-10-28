@@ -11,7 +11,8 @@ One pom, packaging `pom`, no sources. What every plugin's pom would otherwise re
 and JavaFX pinned together (`dependencyManagement`), Java 25, the compiler (3.11.0, `-parameters`), surefire, and
 flatten 1.4.1 `oss` keeping `repositories` and `properties`, and antrun 3.1.0 copying the plugin's
 `CHANGELOG.md` and `icon.png` into the jar as `META-INF/botmaker/changelog.md` and `icon.png` (Studio's
-`PluginJarFiles`), each skipped when missing.
+`PluginJarFiles`), each skipped when missing, and `maven-source-plugin` 3.3.0 attaching a `-sources.jar`, where
+Studio reads a plugin's `@Migrate` rules (2026-10-28).
 
 ## Rules
 

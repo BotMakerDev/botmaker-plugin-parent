@@ -102,6 +102,25 @@
 
         <plugins>
             <!--
+              The -sources.jar beside every plugin jar: @Migrate has source retention, so a plugin's migration
+              rules (beside a @Deprecated(forRemoval = true) element) reach Studio only in its sources, which
+              Studio resolves by the "sources" classifier (2026-10-28). jar-no-fork does not rerun the lifecycle.
+              3.3.0 for JitPack's Maven (umbrella CLAUDE.md § JitPack); the SDK attaches the same.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
               In <plugins>, so every child runs it. Bakes the inherited pins into the pom a plugin installs
               and publishes and drops the <parent>, so a bot resolving the plugin needs neither this pom nor a
               ${…}. oss strips <repositories> and <properties> otherwise: the first a consumer needs to reach
