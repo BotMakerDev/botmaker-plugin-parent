@@ -5,6 +5,13 @@ All notable changes to `botmaker-plugin-parent`.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this module uses
 [semantic versioning](https://semver.org/). The release refuses to cut a version with no section here.
 
+## [Unreleased]
+
+### Fixed
+
+- **CI on a release tag resolves the released contract and toolkit**: its probe pom declares jitpack.io, as a
+  plugin does. v0.1.0's CI failed on that alone; the tag itself resolves.
+
 ## [0.1.0] — 2026-10-28
 
 ### Added

@@ -57,6 +57,8 @@ jobs:
               <relativePath/>
             </parent>
             <artifactId>probe</artifactId>
+            <!-- A tag's pom pins released upstreams, which only JitPack serves; a plugin declares it too. -->
+            <repositories><repository><id>jitpack.io</id><url>https://jitpack.io</url></repository></repositories>
             <dependencies>
               <dependency><groupId>com.github.BotMakerDev</groupId><artifactId>botmaker-studio-api</artifactId></dependency>
               <dependency><groupId>com.github.BotMakerDev</groupId><artifactId>botmaker-plugin-toolkit</artifactId></dependency>
