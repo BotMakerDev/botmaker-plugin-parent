@@ -9,7 +9,9 @@ plugin.
 
 One pom, packaging `pom`, no sources. What every plugin's pom would otherwise repeat: the contract, the toolkit
 and JavaFX pinned together (`dependencyManagement`), Java 25, the compiler (3.11.0, `-parameters`), surefire, and
-flatten 1.4.1 `oss` keeping `repositories` and `properties`.
+flatten 1.4.1 `oss` keeping `repositories` and `properties`, and antrun 3.1.0 copying the plugin's
+`CHANGELOG.md` and `icon.png` into the jar as `META-INF/botmaker/changelog.md` and `icon.png` (Studio's
+`PluginJarFiles`), each skipped when missing.
 
 ## Rules
 

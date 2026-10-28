@@ -138,6 +138,38 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+              The two files a plugin's author writes beside its pom, copied into the jar where Studio reads them:
+              CHANGELOG.md as META-INF/botmaker/changelog.md (the upgrade dialog's "what's new", every section
+              the bot crosses, so the whole file) and icon.png as META-INF/botmaker/icon.png (beside the
+              plugin's name in Plugins & Libraries). Either may be missing: failonerror=false, and Studio shows
+              no highlights or the default icon. antrun, not a <resource>: the module root is not a resource
+              directory, and the changelog is renamed.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>plugin-files</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${project.basedir}/CHANGELOG.md"
+                                      tofile="${project.build.outputDirectory}/META-INF/botmaker/changelog.md"
+                                      failonerror="false" overwrite="true"/>
+                                <copy file="${project.basedir}/icon.png"
+                                      tofile="${project.build.outputDirectory}/META-INF/botmaker/icon.png"
+                                      failonerror="false" overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
