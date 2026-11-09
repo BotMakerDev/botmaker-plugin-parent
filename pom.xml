@@ -46,7 +46,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>27</javafx.version>
         <!-- Each upstream's main version; a release commit sets the released one (doc 43). -->
-        <botmaker.studioapi.version>0.16.1-SNAPSHOT</botmaker.studioapi.version>
+        <botmaker.studioapi.version>0.17.1-SNAPSHOT</botmaker.studioapi.version>
         <botmaker.plugintoolkit.version>0.14.1-SNAPSHOT</botmaker.plugintoolkit.version>
     </properties>
 
