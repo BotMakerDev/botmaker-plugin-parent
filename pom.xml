@@ -14,7 +14,7 @@
     -->
     <groupId>com.github.BotMakerDev</groupId>
     <artifactId>botmaker-plugin-parent</artifactId>
-    <version>0.2.2-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
 
     <name>BotMaker Plugin Parent</name>
@@ -46,8 +46,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>27</javafx.version>
         <!-- Each upstream's main version; a release commit sets the released one (doc 43). -->
-        <botmaker.studioapi.version>0.14.2-SNAPSHOT</botmaker.studioapi.version>
-        <botmaker.plugintoolkit.version>0.13.2-SNAPSHOT</botmaker.plugintoolkit.version>
+        <botmaker.studioapi.version>v0.15.0</botmaker.studioapi.version>
+        <botmaker.plugintoolkit.version>v0.14.0</botmaker.plugintoolkit.version>
     </properties>
 
     <dependencyManagement>
