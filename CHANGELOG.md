@@ -5,7 +5,7 @@ All notable changes to `botmaker-plugin-parent`.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this module uses
 [semantic versioning](https://semver.org/). The release refuses to cut a version with no section here.
 
-## [Unreleased]
+## [0.6.0] — 2026-11-21
 
 ### Changed
 
@@ -14,6 +14,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - This repository is licensed under PolyForm Noncommercial 1.0.0, copyright LiQiyeDev: free for any noncommercial
   use, commercial use needs a license from LiQiyeDev. Releases up to v0.5.0 stay CC0 1.0. The pom declares no
   `<licenses>`, so a plugin naming this parent inherits none.
+- Built against botmaker-studio-api 0.19.0 (was 0.18.0).
+- Built against botmaker-plugin-toolkit 0.17.0 (was 0.16.0).
 
 ## [0.5.0] — 2026-11-16
 
