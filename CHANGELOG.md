@@ -5,6 +5,13 @@ All notable changes to `botmaker-plugin-parent`.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this module uses
 [semantic versioning](https://semver.org/). The release refuses to cut a version with no section here.
 
+## [0.6.2] — 2026-11-24
+
+### Changed
+
+- Built against botmaker-studio-api 0.20.0 (was 0.19.1).
+- Built against botmaker-plugin-toolkit 0.17.2 (was 0.17.1).
+
 ## [0.6.1] — 2026-11-22
 
 ### Changed
