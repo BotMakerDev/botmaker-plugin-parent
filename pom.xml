@@ -48,6 +48,11 @@
         <!-- Each upstream's main version; a release commit sets the released one (doc 43). -->
         <botmaker.studioapi.version>0.20.1-SNAPSHOT</botmaker.studioapi.version>
         <botmaker.plugintoolkit.version>0.17.3-SNAPSHOT</botmaker.plugintoolkit.version>
+        <!-- One zip another build released, unpacked into the jar (the pinned-asset step below). Off while the
+             sha256 is empty. `into` is a folder inside the jar, replaced whole. -->
+        <botmaker.asset.url></botmaker.asset.url>
+        <botmaker.asset.sha256></botmaker.asset.sha256>
+        <botmaker.asset.into></botmaker.asset.into>
     </properties>
 
     <dependencyManagement>
@@ -105,7 +110,7 @@
               The -sources.jar beside every plugin jar: @Migrate has source retention, so a plugin's migration
               rules (beside a @Deprecated(forRemoval = true) element) reach Studio only in its sources, which
               Studio resolves by the "sources" classifier (2026-10-28). jar-no-fork does not rerun the lifecycle.
-              3.3.0 for JitPack's Maven (umbrella CLAUDE.md § JitPack); the SDK attaches the same.
+              3.3.0 for JitPack's Maven (umbrella CLAUDE.md § JitPack).
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -184,6 +189,56 @@
                                 <copy file="${project.basedir}/icon.png"
                                       tofile="${project.build.outputDirectory}/META-INF/botmaker/icon.png"
                                       failonerror="false" overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <!--
+                      Files a plugin ships but does not build, such as a web page: one zip, named by
+                      botmaker.asset.url and pinned by botmaker.asset.sha256, unpacked into botmaker.asset.into
+                      inside the jar, whatever stood there replaced. Nothing happens while the sha256 is empty.
+                      The download is kept in the local repository under its hash, so one build with a network
+                      is enough, and only a file that matches the hash is ever kept.
+                    -->
+                    <execution>
+                        <id>pinned-asset</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target xmlns:if="ant:if" xmlns:unless="ant:unless">
+                                <condition property="asset.pinned">
+                                    <matches string="${botmaker.asset.sha256}" pattern="\S"/>
+                                </condition>
+                                <sequential if:set="asset.pinned">
+                                    <fail message="botmaker.asset.into names no folder inside the jar">
+                                        <condition>
+                                            <not>
+                                                <matches string="${botmaker.asset.into}" pattern="^[A-Za-z0-9_-]"/>
+                                            </not>
+                                        </condition>
+                                    </fail>
+                                    <property name="asset.zip"
+                                              location="${settings.localRepository}/.cache/botmaker-assets/${botmaker.asset.sha256}.zip"/>
+                                    <available property="asset.cached" file="${asset.zip}"/>
+                                    <sequential unless:set="asset.cached">
+                                        <property name="asset.part"
+                                                  location="${project.build.directory}/botmaker-asset.part"/>
+                                        <mkdir dir="${project.build.directory}"/>
+                                        <get src="${botmaker.asset.url}" dest="${asset.part}" retries="6"/>
+                                        <checksum file="${asset.part}" algorithm="SHA-256"
+                                                  property="${botmaker.asset.sha256}" verifyproperty="asset.ok"/>
+                                        <fail message="${botmaker.asset.url} is not the file botmaker.asset.sha256 pins">
+                                            <condition>
+                                                <isfalse value="${asset.ok}"/>
+                                            </condition>
+                                        </fail>
+                                        <move file="${asset.part}" tofile="${asset.zip}"/>
+                                    </sequential>
+                                    <delete dir="${project.build.outputDirectory}/${botmaker.asset.into}"/>
+                                    <unzip src="${asset.zip}"
+                                           dest="${project.build.outputDirectory}/${botmaker.asset.into}"/>
+                                </sequential>
                             </target>
                         </configuration>
                     </execution>

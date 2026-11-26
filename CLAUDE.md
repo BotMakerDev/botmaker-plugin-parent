@@ -12,7 +12,9 @@ and JavaFX pinned together (`dependencyManagement`), Java 25, the compiler (3.11
 flatten 1.4.1 `oss` keeping `repositories` and `properties`, and antrun 3.1.0 copying the plugin's
 `CHANGELOG.md` and `icon.png` into the jar as `META-INF/botmaker/changelog.md` and `icon.png` (Studio's
 `PluginJarFiles`), each skipped when missing, and `maven-source-plugin` 3.3.0 attaching a `-sources.jar`, where
-Studio reads a plugin's `@Migrate` rules (2026-10-28).
+Studio reads a plugin's `@Migrate` rules (2026-10-28). antrun also unpacks one pinned zip into the jar
+(2026-11-26): `botmaker.asset.url`, `botmaker.asset.sha256` and `botmaker.asset.into`, off while the sha256 is
+empty; the download is kept in the local repository under its hash, so an offline build needs it there already.
 
 ## Rules
 
