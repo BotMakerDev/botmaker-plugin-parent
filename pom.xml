@@ -14,7 +14,7 @@
     -->
     <groupId>com.github.BotMakerDev</groupId>
     <artifactId>botmaker-plugin-parent</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>BotMaker Plugin Parent</name>
@@ -46,8 +46,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>27</javafx.version>
         <!-- Each upstream's main version; a release commit sets the released one (doc 43). -->
-        <botmaker.studioapi.version>v0.21.0</botmaker.studioapi.version>
-        <botmaker.plugintoolkit.version>v0.18.0</botmaker.plugintoolkit.version>
+        <botmaker.studioapi.version>0.21.1-SNAPSHOT</botmaker.studioapi.version>
+        <botmaker.plugintoolkit.version>0.18.1-SNAPSHOT</botmaker.plugintoolkit.version>
         <!-- One zip another build released, unpacked into the jar (the pinned-asset step below). Off while the
              sha256 is empty. `into` is a folder inside the jar, replaced whole. -->
         <botmaker.asset.url></botmaker.asset.url>
