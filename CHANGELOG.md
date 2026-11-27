@@ -5,12 +5,17 @@ All notable changes to `botmaker-plugin-parent`.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this module uses
 [semantic versioning](https://semver.org/). The release refuses to cut a version with no section here.
 
-## [Unreleased]
+## [0.7.0] — 2026-11-27
 
 ### Added
 
 - A plugin can ship files it does not build: `botmaker.asset.url`, `botmaker.asset.sha256` and
   `botmaker.asset.into` unpack one pinned zip into the jar. Nothing happens while the sha256 is empty.
+
+### Changed
+
+- Built against botmaker-studio-api 0.21.0 (was 0.20.0).
+- Built against botmaker-plugin-toolkit 0.18.0 (was 0.17.2).
 
 ## [0.6.2] — 2026-11-24
 
